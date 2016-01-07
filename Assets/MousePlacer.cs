@@ -34,7 +34,9 @@ public class MousePlacer : MonoBehaviour {
 
 			if (Input.GetButtonDown("Fire1")){
 
-				activeObject = GameObject.Instantiate(placingObject); //put down object
+				activeObject = (GameObject) GameObject.Instantiate(placingObject,
+					activeObject.transform.position,
+					activeObject.transform.rotation); //put down object
 
 			}
 				
