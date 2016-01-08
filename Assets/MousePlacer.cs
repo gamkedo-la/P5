@@ -7,6 +7,8 @@ public class MousePlacer : MonoBehaviour {
 
 	private GameObject activeObject;
 
+	private int alternateShuffle = 0;
+	public Vector3[] sideAdjustTranslation;
 
 	// Use this for initialization
 	void Start () {
@@ -32,6 +34,8 @@ public class MousePlacer : MonoBehaviour {
 
 			activeObject.transform.position = snapped;
 
+			activeObject.transform.position += sideAdjustTranslation[alternateShuffle];
+
 			if (Input.GetButtonDown("Fire1")){
 
 				activeObject = (GameObject) GameObject.Instantiate(placingObject,
@@ -44,6 +48,10 @@ public class MousePlacer : MonoBehaviour {
 
 				activeObject.transform.Rotate(Vector3.up, -90.0f); //rotate object
 
+				alternateShuffle++;
+				if(alternateShuffle >= 4) {
+					alternateShuffle -= 4;
+				}
 			}
 
 		}
