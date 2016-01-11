@@ -39,6 +39,7 @@ public class MousePlacer : MonoBehaviour {
 			if (Input.GetButtonDown("Fire1")){
 
 				activeObject.GetComponent<Rigidbody>().isKinematic = false;
+				activeObject.GetComponentInChildren<Collider>().isTrigger = false;
 
 				activeObject = (GameObject) GameObject.Instantiate(placingObject,
 					activeObject.transform.position,
