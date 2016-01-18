@@ -26,13 +26,17 @@ public class MousePlacer : MonoBehaviour {
 	//	Debug.Log(mousePos);
 	//	activeObject.transform.position = mousePos;
 
+
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit rhInfo;
 
 		if (Physics.Raycast(ray, out rhInfo, 5000f, clickMask)){ //out causes pass by reference
 
+
+			//if not carrying an object
 			if (activeObject == null){
 
+				//pick up the object assuming that you've clicked on one, while holding the mouse down
 				if (rhInfo.collider.gameObject.CompareTag("PicnicObject") && Input.GetButtonDown("Fire1")){
 			
 					Debug.Log(rhInfo.collider.name);
@@ -49,13 +53,32 @@ public class MousePlacer : MonoBehaviour {
 				}
 
 			}
+			//if carrying an object
 			else {
 
+				//it follows the mouse pointer
 				Vector3 carryPoint = rhInfo.point;
 
 				carryPoint += Vector3.up * 1.5f;
 				activeObject.transform.position = carryPoint;
 
+				if (Input.GetKeyDown(KeyCode.A)){
+
+					activeObject.transform.Rotate(90,0,0);
+
+				}
+				if (Input.GetKeyDown(KeyCode.S)){
+
+					activeObject.transform.Rotate(0,90,0);
+
+				}
+				if (Input.GetKeyDown(KeyCode.D)){
+
+					activeObject.transform.Rotate(0,0,90);
+
+				}
+
+				//until you release the mouse button
 				if (Input.GetButtonUp("Fire1")){
 
 					activeObject.layer = LayerMask.NameToLayer("Default");
