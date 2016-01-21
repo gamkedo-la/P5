@@ -1,12 +1,24 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
+
 
 public class MousePlacer : MonoBehaviour {
 
 //	public GameObject placingObject;
 
 	private GameObject activeObject;
+	private bool hasBeenRotated;
 	int clickMask;
+
+	private List<ScoreValues> atLeastPartlyInBasket;
+
+	private int nutritionScore = 0;
+	private int alcoholScore = 0;
+	private int flavorScore = 0;
+
+	public Text scoreDisplay;
 
 //	private int alternateShuffle = 0;
 //	public Vector3[] sideAdjustTranslation;
@@ -15,12 +27,52 @@ public class MousePlacer : MonoBehaviour {
 	void Start () {
 
 	//	activeObject = GameObject.Instantiate(placingObject);
-		clickMask = ~LayerMask.GetMask("Ignore Raycast"); //flip bitmask 
+		clickMask = ~LayerMask.GetMask("Ignore Raycast"); //flip bitmask
+		atLeastPartlyInBasket = new List<ScoreValues>();
 	
+	}
+
+	public void EnteredBasket(ScoreValues obj){
+
+		atLeastPartlyInBasket.Add(obj);
+
+	}
+
+	public void ExitBasket(ScoreValues obj){
+
+		atLeastPartlyInBasket.Remove(obj);
+
+	}
+
+	public void UpdateScoring() {
+
+		nutritionScore = 0;
+		alcoholScore = 0;
+		flavorScore = 0;
+
+		foreach(ScoreValues oneObj in atLeastPartlyInBasket){
+
+			if (oneObj.isAtLeastPartlyAboveBasket == false){
+
+				nutritionScore += oneObj.nutrition;
+				alcoholScore += oneObj.alcohol;
+				flavorScore += oneObj.flavor;
+
+			}
+
+		}
+
+		scoreDisplay.text = "Total Stats:" 
+			+ "\nNutrition: " + nutritionScore 
+			+ "\nAlcohol: " + alcoholScore 
+			+ "\nFlavor: " + flavorScore;
+
 	}
 	
 	// Update is called once per frame
 	void Update () {
+
+		//Debug.Log(atLeastPartlyInBasket.Count);
 
 		Vector3 mousePos = Input.mousePosition;
 	//	Debug.Log(mousePos);
@@ -41,6 +93,7 @@ public class MousePlacer : MonoBehaviour {
 			
 					Debug.Log(rhInfo.collider.name);
 
+					hasBeenRotated = false;
 					activeObject = rhInfo.collider.gameObject;
 					activeObject.layer = LayerMask.NameToLayer("Ignore Raycast");
 					activeObject.GetComponentInParent<Rigidbody>().useGravity = false;
@@ -64,19 +117,19 @@ public class MousePlacer : MonoBehaviour {
 
 				if (Input.GetKeyDown(KeyCode.A)){
 
-					activeObject.transform.Rotate(0,0,0);
+					cleanUpRotationIfFirst();
 					activeObject.transform.Rotate(90,0,0);
 
 				}
 				if (Input.GetKeyDown(KeyCode.S)){
 
-					activeObject.transform.Rotate(0,0,0);
+					cleanUpRotationIfFirst();
 					activeObject.transform.Rotate(0,90,0);
 
 				}
 				if (Input.GetKeyDown(KeyCode.D)){
 
-					activeObject.transform.Rotate(0,0,0);
+					cleanUpRotationIfFirst();
 					activeObject.transform.Rotate(0,0,90);
 
 				}
@@ -90,47 +143,23 @@ public class MousePlacer : MonoBehaviour {
 					activeObject.GetComponent<Collider>().isTrigger = false;
 					activeObject = null;
 
-				}
+				}//fire1
 					
 
-			}
-			
-				
-
-
-
-
+			}//else
 		
-			//	carryPoint += Vector3.up * 1.5f;
-
-		
-			}
+		}//raycast
 				
-//
-//			activeObject.transform.position += sideAdjustTranslation[alternateShuffle];
+	}//update()
 
-//			if (Input.GetButtonDown("Fire1")){
-//
-//				activeObject.GetComponent<Rigidbody>().isKinematic = false;
-//				activeObject.GetComponentInChildren<Collider>().isTrigger = false;
-//
-//				activeObject = (GameObject) GameObject.Instantiate(placingObject,
-//					activeObject.transform.position,
-//					activeObject.transform.rotation); //put down object
-//
-//			}
-//				
-//			if (Input.GetButtonDown("Fire2")){
-//
-//				activeObject.transform.Rotate(Vector3.up, -90.0f); //rotate object
-//
-////				alternateShuffle++;
-////				if(alternateShuffle >= 4) {
-////					alternateShuffle -= 4;
-////				}
-//			}
+	void cleanUpRotationIfFirst(){
 
+		if (hasBeenRotated==false){
+			hasBeenRotated=true;
+			activeObject.transform.rotation = Quaternion.identity;
 		}
-	
+
 	}
+	
+}//class
 	

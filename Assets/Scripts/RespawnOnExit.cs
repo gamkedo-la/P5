@@ -3,7 +3,7 @@ using System.Collections;
 
 public class RespawnOnExit : MonoBehaviour {
 
-	public GameObject generateThis;
+	public GameObject[] generateThese;
 	public Transform generateAt;
 
 	//private int debt = 0;
@@ -19,8 +19,8 @@ public class RespawnOnExit : MonoBehaviour {
 		//debt--;
 
 		//if (debt < 0){
-			
-			GameObject.Instantiate(generateThis, generateAt.position, generateAt.rotation);
+		int randObj = Random.Range(0, generateThese.Length);
+		GameObject.Instantiate(generateThese[randObj], generateAt.position, generateAt.rotation);
 
 		//}
 
