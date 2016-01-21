@@ -64,16 +64,19 @@ public class MousePlacer : MonoBehaviour {
 
 				if (Input.GetKeyDown(KeyCode.A)){
 
+					activeObject.transform.Rotate(0,0,0);
 					activeObject.transform.Rotate(90,0,0);
 
 				}
 				if (Input.GetKeyDown(KeyCode.S)){
 
+					activeObject.transform.Rotate(0,0,0);
 					activeObject.transform.Rotate(0,90,0);
 
 				}
 				if (Input.GetKeyDown(KeyCode.D)){
 
+					activeObject.transform.Rotate(0,0,0);
 					activeObject.transform.Rotate(0,0,90);
 
 				}
