@@ -6,24 +6,31 @@ public class RespawnOnExit : MonoBehaviour {
 	public GameObject[] generateThese;
 	public Transform generateAt;
 
-	//private int debt = 0;
 
-	void OnTriggerEnter(Collider col){
+	void Start(){
 
-	//	debt++;
+		RandomSpawn();
 
 	}
 
 	void OnTriggerExit(Collider col){
+		
+		ScoreValues scoreValues = col.transform.GetComponentInParent<ScoreValues>();
 
-		//debt--;
+		if (scoreValues != null && scoreValues.removedYet == false){
 
-		//if (debt < 0){
+			RandomSpawn();
+			scoreValues.removedYet = true;
+
+		}
+
+
+	}
+
+	void RandomSpawn(){
+
 		int randObj = Random.Range(0, generateThese.Length);
 		GameObject.Instantiate(generateThese[randObj], generateAt.position, generateAt.rotation);
-
-		//}
-
 
 	}
 }

@@ -2,7 +2,18 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
+[Serializable]
+public class TunedLevel	{
+
+	public int nutritionGoal = 10;
+	public int alcoholGoal = 10;
+	public int flavorGoal = 10;
+	public int costLimit = 20;
+	public int weightLimit = 4500;
+
+}
 
 public class MousePlacer : MonoBehaviour {
 
@@ -17,6 +28,11 @@ public class MousePlacer : MonoBehaviour {
 	private int nutritionScore = 0;
 	private int alcoholScore = 0;
 	private int flavorScore = 0;
+	private int costNow = 0;
+	private int weightNow = 0;
+
+	public TunedLevel[] levels;
+	static public int levelNow = 0; //keeps level between scene changes
 
 	public Text scoreDisplay;
 
@@ -50,6 +66,9 @@ public class MousePlacer : MonoBehaviour {
 		alcoholScore = 0;
 		flavorScore = 0;
 
+		costNow = 0;
+		weightNow = 0;
+
 		foreach(ScoreValues oneObj in atLeastPartlyInBasket){
 
 			if (oneObj.isAtLeastPartlyAboveBasket == false){
@@ -58,14 +77,41 @@ public class MousePlacer : MonoBehaviour {
 				alcoholScore += oneObj.alcohol;
 				flavorScore += oneObj.flavor;
 
+				costNow += oneObj.itemCost;
+				weightNow += oneObj.itemWeight;
+
 			}
 
 		}
 
+		TunedLevel lvl = levels[levelNow];
+
+		if (nutritionScore >= lvl.nutritionGoal && alcoholScore >= lvl.alcoholGoal && flavorScore >= lvl.flavorGoal
+			&& costNow <= lvl.costLimit && weightNow <= lvl.weightLimit){
+
+			Debug.Log("YOU WIN!");
+			levelNow++;
+
+			if(levelNow >= levels.Length){
+
+				levelNow = levels.Length - 1;
+				Debug.Log("No mas levels.");
+
+			}
+
+			Application.LoadLevel(Application.loadedLevel); //restart
+
+		}
+			
+
 		scoreDisplay.text = "Total Stats:" 
-			+ "\nNutrition: " + nutritionScore 
-			+ "\nAlcohol: " + alcoholScore 
-			+ "\nFlavor: " + flavorScore;
+			+ "\nNutrition: " + nutritionScore + "/" + lvl.nutritionGoal 
+			+ "\nAlcohol: " + alcoholScore + "/" + lvl.alcoholGoal 
+			+ "\nFlavor: " + flavorScore + "/" + lvl.flavorGoal
+			+ "\nLIMITS"
+			+ "\nCost: $" + costNow + ".00/$" + lvl.costLimit + ".00"
+			+ "\nWeight: " + weightNow + "/" + lvl.weightLimit + "(g)"
+			;
 
 	}
 	
