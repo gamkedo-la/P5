@@ -54,6 +54,8 @@ public class MousePlacer : MonoBehaviour {
 	public Text alcoDisplayItem;
 	public RectTransform alcoDisplayBar;
 
+	public GameObject itemInfo;
+
 	public Text costWeight;
 
 //	private int alternateShuffle = 0;
@@ -65,6 +67,7 @@ public class MousePlacer : MonoBehaviour {
 	//	activeObject = GameObject.Instantiate(placingObject);
 		clickMask = ~LayerMask.GetMask("Ignore Raycast"); //flip bitmask
 		atLeastPartlyInBasket = new List<ScoreValues>();
+		itemInfo.SetActive(false);
 		UpdateScoring();
 	}
 
@@ -144,7 +147,7 @@ public class MousePlacer : MonoBehaviour {
 
 		costWeight.text = "Cost: $" + costNow + ".00/$" + lvl.costLimit + ".00"
 		+ "\nWeight: " + weightNow + "/" + lvl.weightLimit + "g"
-		+ "\n==============";
+		+ "\n=============="; // ugly hack to reduce the font changing sizes due to best fit when weights are low
 	}
 	
 	// Update is called once per frame
@@ -196,6 +199,7 @@ public class MousePlacer : MonoBehaviour {
 					heldItemFacts.text = svScript.funFacts;
 					heldItemCost.text = "$"+svScript.itemCost+".00";
 					heldItemWeight.text = svScript.itemWeight+"g";
+					itemInfo.SetActive(true);
 				}
 
 			}
@@ -239,6 +243,15 @@ public class MousePlacer : MonoBehaviour {
 					activeObject.GetComponent<Collider>().isTrigger = false;
 					activeObject = null;
 
+					nutrDisplayItem.text = "Nutrition: ?";
+					flavDisplayItem.text = "Flavor: ?";
+					alcoDisplayItem.text = "Alcohol: ?";
+
+					heldItemName.text = "Item Name";
+					heldItemFacts.text = "Prepare yourself for amazing facts";
+					heldItemCost.text = "Cost";
+					heldItemWeight.text = "Weight";
+					itemInfo.SetActive(false);
 				}//fire1
 					
 
