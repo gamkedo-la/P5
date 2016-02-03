@@ -18,6 +18,8 @@ public class TunedLevel	{
 public class MousePlacer : MonoBehaviour {
 
 //	public GameObject placingObject;
+	public Shader diffuseShader;
+	public Shader selectionShader;
 
 	private GameObject activeObject;
 	private bool hasBeenRotated;
@@ -36,6 +38,24 @@ public class MousePlacer : MonoBehaviour {
 
 	public Text scoreDisplay;
 
+	public Text heldItemName;
+	public Text heldItemCost;
+	public Text heldItemWeight;
+	public Text heldItemFacts;
+
+	public Text nutrDisplayTotal;
+	public Text flavDisplayTotal;
+	public Text alcoDisplayTotal;
+
+	public Text nutrDisplayItem;
+	public RectTransform nutrDisplayBar;
+	public Text flavDisplayItem;
+	public RectTransform flavDisplayBar;
+	public Text alcoDisplayItem;
+	public RectTransform alcoDisplayBar;
+
+	public Text costWeight;
+
 //	private int alternateShuffle = 0;
 //	public Vector3[] sideAdjustTranslation;
 
@@ -45,7 +65,7 @@ public class MousePlacer : MonoBehaviour {
 	//	activeObject = GameObject.Instantiate(placingObject);
 		clickMask = ~LayerMask.GetMask("Ignore Raycast"); //flip bitmask
 		atLeastPartlyInBasket = new List<ScoreValues>();
-	
+		UpdateScoring();
 	}
 
 	public void EnteredBasket(ScoreValues obj){
@@ -103,16 +123,28 @@ public class MousePlacer : MonoBehaviour {
 
 		}
 			
+		nutrDisplayTotal.text = nutritionScore + "/ " + lvl.nutritionGoal;
+		flavDisplayTotal.text = flavorScore + "/ " + lvl.flavorGoal;
+		alcoDisplayTotal.text = alcoholScore + "/ " + lvl.alcoholGoal;
 
-		scoreDisplay.text = "Total Stats:" 
-			+ "\nNutrition: " + nutritionScore + "/" + lvl.nutritionGoal 
-			+ "\nAlcohol: " + alcoholScore + "/" + lvl.alcoholGoal 
-			+ "\nFlavor: " + flavorScore + "/" + lvl.flavorGoal
-			+ "\nLIMITS"
-			+ "\nCost: $" + costNow + ".00/$" + lvl.costLimit + ".00"
-			+ "\nWeight: " + weightNow + "/" + lvl.weightLimit + "(g)"
-			;
+		Vector3 newScale = Vector3.one;
+		newScale.x = ((float)nutritionScore) / ((float)lvl.nutritionGoal);
+		newScale.x = Mathf.Clamp01(newScale.x);
+		nutrDisplayBar.localScale = newScale;
 
+		newScale = Vector3.one;
+		newScale.x = ((float)flavorScore) / ((float)lvl.flavorGoal);
+		newScale.x = Mathf.Clamp01(newScale.x);
+		flavDisplayBar.localScale = newScale;
+
+		newScale = Vector3.one;
+		newScale.x = ((float)alcoholScore) / ((float)lvl.alcoholGoal);
+		newScale.x = Mathf.Clamp01(newScale.x);
+		alcoDisplayBar.localScale = newScale;
+
+		costWeight.text = "Cost: $" + costNow + ".00/$" + lvl.costLimit + ".00"
+		+ "\nWeight: " + weightNow + "/" + lvl.weightLimit + "g"
+		+ "\n==============";
 	}
 	
 	// Update is called once per frame
@@ -141,6 +173,8 @@ public class MousePlacer : MonoBehaviour {
 
 					hasBeenRotated = false;
 					activeObject = rhInfo.collider.gameObject;
+					Renderer rend = activeObject.GetComponent<Renderer>();
+					rend.material.shader = selectionShader;
 					activeObject.layer = LayerMask.NameToLayer("Ignore Raycast");
 					activeObject.GetComponentInParent<Rigidbody>().useGravity = false;
 					activeObject.GetComponentInParent<Rigidbody>().isKinematic = true;
@@ -149,6 +183,19 @@ public class MousePlacer : MonoBehaviour {
 					activeObject.GetComponentInParent<Rigidbody>().velocity = Vector3.zero;
 					activeObject.GetComponentInParent<Rigidbody>().angularVelocity = Vector3.zero;
 
+					ScoreValues svScript = activeObject.GetComponentInParent<ScoreValues>();
+					nutrDisplayItem.text = "Nutrition: "+svScript.nutrition;
+					flavDisplayItem.text = "Flavor: "+svScript.flavor;
+					alcoDisplayItem.text = "Alcohol: "+svScript.alcohol;
+
+					String nameNoClone = svScript.name;
+					nameNoClone = nameNoClone.Replace("(Clone)", "");
+					nameNoClone = nameNoClone.Trim();
+					svScript.name = nameNoClone;
+					heldItemName.text = nameNoClone;
+					heldItemFacts.text = svScript.funFacts;
+					heldItemCost.text = "$"+svScript.itemCost+".00";
+					heldItemWeight.text = svScript.itemWeight+"g";
 				}
 
 			}
@@ -182,6 +229,9 @@ public class MousePlacer : MonoBehaviour {
 
 				//until you release the mouse button
 				if (Input.GetButtonUp("Fire1")){
+
+					Renderer rend = activeObject.GetComponent<Renderer>();
+					rend.material.shader = diffuseShader;
 
 					activeObject.layer = LayerMask.NameToLayer("Default");
 					activeObject.GetComponentInParent<Rigidbody>().useGravity = true;

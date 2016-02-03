@@ -14,6 +14,8 @@ public class ScoreValues : MonoBehaviour {
 	public bool removedYet = false; //first time out of the basket to solve respawning bug
 	public bool required = false;
 
+	public string funFacts = "";
+
 	public bool isAtLeastPartlyInBasket = false;
 	public bool isAtLeastPartlyAboveBasket = false;
 }
