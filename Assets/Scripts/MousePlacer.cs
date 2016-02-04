@@ -189,7 +189,7 @@ public class MousePlacer : MonoBehaviour {
 					ScoreValues svScript = activeObject.GetComponentInParent<ScoreValues>();
 					nutrDisplayItem.text = "Nutrition: "+svScript.nutrition;
 					flavDisplayItem.text = "Flavor: "+svScript.flavor;
-					alcoDisplayItem.text = "Alcohol: "+svScript.alcohol;
+					alcoDisplayItem.text = "Maturity: "+svScript.alcohol;
 
 					String nameNoClone = svScript.name;
 					nameNoClone = nameNoClone.Replace("(Clone)", "");
