@@ -18,6 +18,12 @@ public class TunedLevel	{
 public class MousePlacer : MonoBehaviour {
 
 //	public GameObject placingObject;
+	public AudioClip[] voices;
+	private int voiceNum = 0;
+	private AudioSource mySound;
+	public AudioClip lift;
+	public AudioClip release;
+
 	public Shader diffuseShader;
 	public Shader selectionShader;
 	public Shader invalidShader;
@@ -64,7 +70,8 @@ public class MousePlacer : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-
+		mySound = GetComponent<AudioSource>();
+		voiceNum = UnityEngine.Random.Range(0, voices.Length);
 	//	activeObject = GameObject.Instantiate(placingObject);
 		clickMask = ~LayerMask.GetMask("Ignore Raycast"); //flip bitmask
 		atLeastPartlyInBasket = new List<ScoreValues>();
@@ -193,6 +200,11 @@ public class MousePlacer : MonoBehaviour {
 					GameObject mouseOverObject = rhInfo.collider.gameObject;
 					Renderer rend = mouseOverObject.GetComponent<Renderer>();
 					if(Input.GetButtonDown("Fire1")) {
+						if(mySound.isPlaying == false) {
+							mySound.clip = lift;
+							mySound.Play();
+						}
+
 						hasBeenRotated = false;
 						activeObject = mouseOverObject;
 						rend.material.shader = selectionShader;
@@ -253,6 +265,18 @@ public class MousePlacer : MonoBehaviour {
 
 				//until you release the mouse button
 				if (Input.GetButtonUp("Fire1")){
+
+					if(mySound.isPlaying == false && UnityEngine.Random.Range(0,100)<19) {
+						mySound.clip = voices[voiceNum];
+						mySound.Play();
+						voiceNum++;
+						voiceNum = voiceNum % voices.Length;
+					}
+
+					if(mySound.isPlaying == false) {
+						mySound.clip = release;
+						mySound.Play();
+					}
 
 					Renderer rend = activeObject.GetComponent<Renderer>();
 					rend.material.shader = invalidShader;//diffuseShader;
