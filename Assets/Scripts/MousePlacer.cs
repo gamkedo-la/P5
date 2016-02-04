@@ -171,7 +171,7 @@ public class MousePlacer : MonoBehaviour {
 		alcoDisplayBar.localScale = newScale;
 
 		costWeight.text = "Cost: $" + costNow + ".00/$" + lvl.costLimit + ".00"
-		+ "\nWeight: " + weightNow + "/" + lvl.weightLimit + "g"
+		+ "\nWeight: " + weightNow + "g/" + lvl.weightLimit + "g"
 		+ "\n=============="; // ugly hack to reduce the font changing sizes due to best fit when weights are low
 	}
 	
