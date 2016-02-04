@@ -20,6 +20,7 @@ public class MousePlacer : MonoBehaviour {
 //	public GameObject placingObject;
 	public Shader diffuseShader;
 	public Shader selectionShader;
+	public Shader invalidShader;
 
 	private GameObject activeObject;
 	private bool hasBeenRotated;
@@ -74,12 +75,16 @@ public class MousePlacer : MonoBehaviour {
 	public void EnteredBasket(ScoreValues obj){
 
 		atLeastPartlyInBasket.Add(obj);
-
 	}
 
 	public void ExitBasket(ScoreValues obj){
 
 		atLeastPartlyInBasket.Remove(obj);
+
+		Renderer rend = obj.GetComponentInChildren<Renderer>();
+		if(rend.material.shader != selectionShader) {
+			rend.material.shader = invalidShader;
+		}
 
 	}
 
@@ -94,6 +99,13 @@ public class MousePlacer : MonoBehaviour {
 
 		foreach(ScoreValues oneObj in atLeastPartlyInBasket){
 
+			Renderer rend = oneObj.GetComponentInChildren<Renderer>();
+
+
+			if(rend.material.shader == selectionShader) { // don't count object held in hand
+				continue;
+			}
+
 			if (oneObj.isAtLeastPartlyAboveBasket == false){
 
 				nutritionScore += oneObj.nutrition;
@@ -102,7 +114,13 @@ public class MousePlacer : MonoBehaviour {
 
 				costNow += oneObj.itemCost;
 				weightNow += oneObj.itemWeight;
-
+				if(rend.material.shader != diffuseShader) {
+					rend.material.shader = diffuseShader;
+				}
+			} else {
+				if(rend.material.shader != invalidShader) {
+					rend.material.shader = invalidShader;
+				}
 			}
 
 		}
@@ -170,26 +188,26 @@ public class MousePlacer : MonoBehaviour {
 			if (activeObject == null){
 
 				//pick up the object assuming that you've clicked on one, while holding the mouse down
-				if (rhInfo.collider.gameObject.CompareTag("PicnicObject") && Input.GetButtonDown("Fire1")){
+				if(rhInfo.collider.gameObject.CompareTag("PicnicObject")) {
 			
-					Debug.Log(rhInfo.collider.name);
+					GameObject mouseOverObject = rhInfo.collider.gameObject;
+					Renderer rend = mouseOverObject.GetComponent<Renderer>();
+					if(Input.GetButtonDown("Fire1")) {
+						hasBeenRotated = false;
+						activeObject = mouseOverObject;
+						rend.material.shader = selectionShader;
+						activeObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+						activeObject.GetComponentInParent<Rigidbody>().useGravity = false;
+						activeObject.GetComponentInParent<Rigidbody>().isKinematic = true;
+						activeObject.GetComponent<Collider>().isTrigger = true;
+						activeObject.GetComponentInParent<Rigidbody>().velocity = Vector3.zero;
+						activeObject.GetComponentInParent<Rigidbody>().angularVelocity = Vector3.zero;
+					}
 
-					hasBeenRotated = false;
-					activeObject = rhInfo.collider.gameObject;
-					Renderer rend = activeObject.GetComponent<Renderer>();
-					rend.material.shader = selectionShader;
-					activeObject.layer = LayerMask.NameToLayer("Ignore Raycast");
-					activeObject.GetComponentInParent<Rigidbody>().useGravity = false;
-					activeObject.GetComponentInParent<Rigidbody>().isKinematic = true;
-					activeObject.GetComponent<Collider>().isTrigger = true;
-
-					activeObject.GetComponentInParent<Rigidbody>().velocity = Vector3.zero;
-					activeObject.GetComponentInParent<Rigidbody>().angularVelocity = Vector3.zero;
-
-					ScoreValues svScript = activeObject.GetComponentInParent<ScoreValues>();
-					nutrDisplayItem.text = "Nutrition: "+svScript.nutrition;
-					flavDisplayItem.text = "Flavor: "+svScript.flavor;
-					alcoDisplayItem.text = "Maturity: "+svScript.alcohol;
+					ScoreValues svScript = mouseOverObject.GetComponentInParent<ScoreValues>();
+					nutrDisplayItem.text = "Nutrition: " + svScript.nutrition;
+					flavDisplayItem.text = "Flavor: " + svScript.flavor;
+					alcoDisplayItem.text = "Maturity: " + svScript.alcohol;
 
 					String nameNoClone = svScript.name;
 					nameNoClone = nameNoClone.Replace("(Clone)", "");
@@ -197,9 +215,11 @@ public class MousePlacer : MonoBehaviour {
 					svScript.name = nameNoClone;
 					heldItemName.text = nameNoClone;
 					heldItemFacts.text = svScript.funFacts;
-					heldItemCost.text = "$"+svScript.itemCost+".00";
-					heldItemWeight.text = svScript.itemWeight+"g";
+					heldItemCost.text = "$" + svScript.itemCost + ".00";
+					heldItemWeight.text = svScript.itemWeight + "g";
 					itemInfo.SetActive(true);
+				} else {
+					itemInfo.SetActive(false);
 				}
 
 			}
@@ -235,7 +255,7 @@ public class MousePlacer : MonoBehaviour {
 				if (Input.GetButtonUp("Fire1")){
 
 					Renderer rend = activeObject.GetComponent<Renderer>();
-					rend.material.shader = diffuseShader;
+					rend.material.shader = invalidShader;//diffuseShader;
 
 					activeObject.layer = LayerMask.NameToLayer("Default");
 					activeObject.GetComponentInParent<Rigidbody>().useGravity = true;
